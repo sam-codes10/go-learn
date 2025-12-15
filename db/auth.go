@@ -5,6 +5,6 @@ import (
 	"auth-service/models"
 )
 
-func SaveUserProfile(userProfile models.UserProfile) error {
-	return dbops.DB.Save(userProfile).Error
+func CreateUserProfile(userProfile models.UserProfile) error {
+	return dbops.DB.Create(userProfile).Error
 }

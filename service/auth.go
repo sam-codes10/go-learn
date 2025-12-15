@@ -22,7 +22,7 @@ func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 		Verified:    false,
 	}
 
-	err := db.SaveUserProfile(userProfile)
+	err := db.CreateUserProfile(userProfile)
 	if err != nil {
 		return apihelpers.SendInternalServerError("Some internal server occurred!")
 	}

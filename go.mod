@@ -2,7 +2,11 @@ module auth-service
 
 go 1.24.4
 
-require github.com/gin-gonic/gin v1.11.0
+require (
+	github.com/gin-gonic/gin v1.11.0
+	github.com/swaggo/swag v1.8.12
+	gorm.io/gorm v1.25.10
+)
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -28,10 +32,8 @@ require (
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/swaggo/swag v1.8.12 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/gorm v1.25.10 // indirect
 )
 
 require (

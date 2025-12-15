@@ -11,12 +11,12 @@ import (
 // @Tags Auth
 // @Summary User Signup
 // @Description API for user signup
-// @Param body models.SignUp true "Signup Payload"
+// @Param body body models.SignUp true "Signup Payload"
 // @Success 200 {object} apihelpers.APIRes
 // @Router /v1/auth/signup [post]
 func SignUp(c *gin.Context) {
 	var payload models.SignUp
-	
+
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		apihelpers.SendBadRequest(c, "invalid payload")
 		return
