@@ -7,4 +7,9 @@ type UserProfile struct {
 	Email       string `gorm:"column:email"`
 	PhoneNumber string `gorm:"column:phone_number"`
 	Password    string `gorm:"column:password"`
+	Verified    bool   `gorm:"column:verified"`
+}
+
+func (UserProfile) TableName() string {
+	return "user_profile"
 }

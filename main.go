@@ -6,6 +6,8 @@ import (
 	"auth-service/router"
 
 	"github.com/joho/godotenv"
+
+	_ "auth-service/docs"
 )
 
 func main() {

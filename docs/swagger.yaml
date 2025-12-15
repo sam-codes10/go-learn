@@ -1,0 +1,42 @@
+definitions:
+  apihelpers.APIRes:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: boolean
+    type: object
+  models.SignUp:
+    properties:
+      emailId:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phoneNumber:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/auth/signup:
+    post:
+      description: API for user signup
+      parameters:
+      - description: Signup Payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUp'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apihelpers.APIRes'
+      summary: User Signup
+      tags:
+      - Auth
+swagger: "2.0"

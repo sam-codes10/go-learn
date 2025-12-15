@@ -1,6 +1,8 @@
 package router
 
 import (
+	"auth-service/controller"
+
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -9,7 +11,7 @@ import (
 func InitRouters() *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/swagger/cardinal/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/swagger/auth-service/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Use(func(c *gin.Context) {
 		// add header Access-Control-Allow-Origin
 		c.Writer.Header().Set("Content-Type", "application/json")
@@ -25,5 +27,11 @@ func InitRouters() *gin.Engine {
 			c.Next()
 		}
 	})
+
+	v1Auth := r.Group("/v1/auth")
+	{
+		v1Auth.POST("/signup", controller.SignUp)
+		
+	}
 	return r
 }
