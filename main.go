@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"notifier-service/config"
+	"notifier-service/constants"
 	"notifier-service/kafka"
 	"notifier-service/notifier"
 	"os"
@@ -19,7 +20,7 @@ func main() {
 	if env == "" {
 		env = "local"
 	}
-	senderMail := os.Getenv("mail")
+	senderMail := constants.Mail
 
 	config := config.Start(env)
 

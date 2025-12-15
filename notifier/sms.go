@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"notifier-service/constants"
 	"notifier-service/models"
-	"os"
 
 	"github.com/twilio/twilio-go"
 	openapi "github.com/twilio/twilio-go/rest/api/v2010"
@@ -13,14 +13,19 @@ import (
 
 func SendSMS(value []byte) error {
 	var msg models.SMSMessage
-	msgFrom := os.Getenv("MSG_FROM")
+
+	msgFrom := constants.MsgFrom
+
 	err := json.Unmarshal(value, &msg)
 	if err != nil {
 		log.Fatal("SendSMS (notifier) - Wrong SMS format")
 		return err
 	}
 
-	client := twilio.NewRestClient()
+	client := twilio.NewRestClientWithParams(twilio.ClientParams{
+		Username: constants.TwilioAccountSID,
+		Password: constants.TwilioAuthToken,
+	})
 
 	params := &openapi.CreateMessageParams{}
 	params.SetTo(msg.To)
