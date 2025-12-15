@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"notifier-service/config"
 	"notifier-service/kafka"
 	"notifier-service/notifier"
@@ -23,6 +24,8 @@ func main() {
 	config := config.Start(env)
 
 	consumer := kafka.NewConsumer(config)
+
+	log.Print("started the consumer..")
 
 	handler := func(key, value []byte) error {
 		switch string(key) {
