@@ -25,5 +25,11 @@ func InitRouters() *gin.Engine {
 			c.Next()
 		}
 	})
+
+	v1Auth := r.Group("/v1/auth")
+	{
+		v1Auth.POST("/signup")
+		
+	}
 	return r
 }
