@@ -15,6 +15,11 @@ func SendSMS(value []byte) error {
 		log.Fatal("SendSMS (notifier) - Wrong SMS format")
 		return err
 	}
-	fmt.Println("sending email to:", msg.To)
+	
+	smsMsg := models.SMSMessage{
+		To:   msg.To,
+		Text: msg.Text,
+	}
+	fmt.Println("sending SMS to:", smsMsg.To)
 	return nil
 }

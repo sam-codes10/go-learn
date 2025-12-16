@@ -21,7 +21,7 @@ func GetConfig() *viper.Viper {
 	return configInstance.viper
 }
 
-func Start(env string) EnvConfig {
+func Start(env string) Config {
 
 	v := GetConfig()
 
@@ -33,23 +33,17 @@ func Start(env string) EnvConfig {
 		log.Fatalf("Error reading config file: %v", err)
 	}
 
-	var cfg Config
+	var cfg EnvConfig
 
 	if err := v.Unmarshal(&cfg); err != nil {
 		log.Fatalf("unable to decode config into struct: %v", err)
 	}
 
-	var config EnvConfig
+	var config Config
 	switch env {
 	case "local":
 		config.Kafka = cfg.Local.Kafka
 		config.SMTP = cfg.Local.SMTP
-	case "dev":
-		config.Kafka = cfg.Dev.Kafka
-		config.SMTP = cfg.Dev.SMTP
-	case "prod":
-		config.Kafka = cfg.Prod.Kafka
-		config.SMTP = cfg.Prod.SMTP
 	default:
 		log.Panic("unknown env: ", env)
 	}
@@ -59,8 +53,6 @@ func Start(env string) EnvConfig {
 
 type KafkaConfig struct {
 	KafkaBrokers []string `mapstructure:"brokers"`
-	KafkaTopic   string   `mapstructure:"topic"`
-	KafkaGroup   string   `mapstructure:"group"`
 }
 
 type SMTPConfig struct {
@@ -70,13 +62,11 @@ type SMTPConfig struct {
 	SMTPPass string `mapstructure:"pass"`
 }
 
-type EnvConfig struct {
+type Config struct {
 	Kafka KafkaConfig `mapstructure:"kafka"`
 	SMTP  SMTPConfig  `mapstructure:"smtp"`
 }
 
-type Config struct {
-	Local EnvConfig `mapstructure:"local"`
-	Dev   EnvConfig `mapstructure:"dev"`
-	Prod  EnvConfig `mapstructure:"prod"`
+type EnvConfig struct {
+	Local Config `mapstructure:"local"`
 }
