@@ -3,9 +3,14 @@ package kafka
 
 import (
 	"context"
-	"log"
+	"encoding/json"
 	"notifier-service/config"
-	"time"
+	"notifier-service/loggerconfig"
+	"notifier-service/models"
+	"notifier-service/notifier"
+	"sync"
+
+	// "time"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -14,36 +19,55 @@ type Consumer struct {
 	reader *kafka.Reader
 }
 
-func NewConsumer(config config.EnvConfig) *Consumer {
+func NewConsumer(topic, group string, config config.Config) *Consumer {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  config.Kafka.KafkaBrokers,
-		GroupID:  config.Kafka.KafkaGroup,
-		Topic:    config.Kafka.KafkaTopic,
+		GroupID:  group,
+		Topic:    topic,
 		MinBytes: 1,
 		MaxBytes: 10e6,
 	})
 	return &Consumer{reader: r}
 }
 
-func (c *Consumer) Start(ctx context.Context, handler func(key []byte, value []byte) error) error {
+func (c *Consumer) Start(ctx context.Context, cfg config.Config) error {
 	defer c.reader.Close()
 
 	for {
-		m, err := c.reader.ReadMessage(ctx)
+		msg, err := c.reader.ReadMessage(ctx)
 		if err != nil {
 			if ctx.Err() != nil {
+				loggerconfig.Error("kafka-consumer: context cancelled, stopping consumer")
 				return nil
 			}
-			log.Println("kafka-read error:", err)
-			time.Sleep(time.Second)
+			loggerconfig.Error("kafka-read error:", err)
+			// time.Sleep(time.Second)
 			continue
 		}
 
-		log.Printf("Kafka message: topic=%s partition=%d offset=%d key=%s\n",
-			m.Topic, m.Partition, m.Offset, string(m.Key))
+		loggerconfig.Info("Kafka message: topic=%s partition=%d offset=%d key=%s\n", msg.Topic, msg.Partition, msg.Offset, string(msg.Key))
 
-		if err := handler(m.Key, m.Value); err != nil {
-			log.Println("handler error:", err)
+		switch msg.Topic {
+		case "otp":
+			loggerconfig.Info("Processed OTP message: %s", string(msg.Value))
+			var consumerMessageOTP models.ConsumerMessageOTP
+			err := json.Unmarshal(msg.Value, &consumerMessageOTP)
+			if err != nil {
+				loggerconfig.Error("kafka-consumer: failed to unmarshal OTP message:", err)
+				continue
+			}
+			var wg *sync.WaitGroup
+			if consumerMessageOTP.SMS {
+				wg.Add(1)
+				go notifier.SendSMS(json.RawMessage(consumerMessageOTP.Content))
+			}
+			if consumerMessageOTP.Email {
+				wg.Add(1)
+				go notifier.SendEmail(json.RawMessage(consumerMessageOTP.Content), cfg)
+			}
+			wg.Wait()
+		default:
+			loggerconfig.Info("No specific processing for topic: %s", msg.Topic)
 		}
 	}
 }

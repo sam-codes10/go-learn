@@ -3,39 +3,7 @@
         "kafka": {
             "brokers": [
                 "localhost:9092"
-            ],
-            "topic": "email.send",
-            "group": "mailer-service"
-        },
-        "smtp": {
-            "host": "live.smtp.mailtrap.io",
-            "port": 587,
-            "user": "smtp@mailtrap.io",
-            "pass": "2bee3db2fd636f8327c1174881f5ef54"
-        }
-    },
-    "dev": {
-        "kafka": {
-            "brokers": [
-                "localhost:9092"
-            ],
-            "topic": "email.send",
-            "group": "mailer-service"
-        },
-        "smtp": {
-            "host": "live.smtp.mailtrap.io",
-            "port": 587,
-            "user": "smtp@mailtrap.io",
-            "pass": "2bee3db2fd636f8327c1174881f5ef54"
-        }
-    },
-    "prod": {
-        "kafka": {
-            "brokers": [
-                "localhost:9092"
-            ],
-            "topic": "email.send",
-            "group": "mailer-service"
+            ]
         },
         "smtp": {
             "host": "live.smtp.mailtrap.io",
