@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"notifier-service/config"
 	"notifier-service/kafka"
 	"os"
@@ -21,4 +22,6 @@ func main() {
 
 	otpConsumer := kafka.NewConsumer("otp", "otp-notifier-group", cfg)
 	go otpConsumer.Start(context.Background(), cfg)
+	fmt.Println("eof")
+	select {}
 }
