@@ -4,6 +4,8 @@ import (
 	"auth-service/dbops"
 	"auth-service/loggerconfig"
 	"auth-service/router"
+	"fmt"
+	"os"
 
 	"github.com/joho/godotenv"
 
@@ -11,10 +13,12 @@ import (
 )
 
 func main() {
+	env := os.Getenv("GO_ENV")
 	e := godotenv.Load()
 	if e != nil {
-		// fmt.Print(e)
+		fmt.Print(e)
 	}
+
 	loggerconfig.InitLogrus()
 	loggerconfig.Info("GIN auth-service started!")
 
@@ -22,11 +26,19 @@ func main() {
 	if err != nil {
 		loggerconfig.Panic("unable to load config")
 	}
-	err = dbops.InitPostgres(cfg)
+
+	err = dbops.InitPostgres(cfg, env)
 	if err != nil {
 		loggerconfig.Panic("Unable to connect db")
 	}
+
+	err = dbops.InitRedis(cfg, env)
+	if err != nil {
+		loggerconfig.Panic("Unable to connect redis")
+	}
+
 	dbops.MigrateTables()
+
 	r := router.InitRouters()
 	port := "8080"
 	r.Run(":" + port)

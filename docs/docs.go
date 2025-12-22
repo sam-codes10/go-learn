@@ -15,6 +15,33 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/auth/send-email-otp": {
+            "get": {
+                "description": "API for sending otp by email",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "send email otp",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "satish.sund3r@gmail.com",
+                        "description": "email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apihelpers.APIRes"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/auth/signup": {
             "post": {
                 "description": "API for user signup",
@@ -31,6 +58,40 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.SignUp"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apihelpers.APIRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/verify-email-otp": {
+            "get": {
+                "description": "API for verifying otp by email",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "verify email otp",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "satish.sund3r@gmail.com",
+                        "description": "email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "otp",
+                        "name": "otp",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {

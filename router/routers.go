@@ -31,7 +31,8 @@ func InitRouters() *gin.Engine {
 	v1Auth := r.Group("/v1/auth")
 	{
 		v1Auth.POST("/signup", controller.SignUp)
-		
+		v1Auth.GET("/send-email-otp", controller.SendEmailOTP)
+		v1Auth.GET("/verify-email-otp", controller.VerifyEmailOtp)
 	}
 	return r
 }
