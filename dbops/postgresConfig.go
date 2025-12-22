@@ -3,24 +3,25 @@ package dbops
 import (
 	"fmt"
 	"log"
-	"os"
+	// "os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB 
-func InitPostgres(config Config) error {
-	env := os.Getenv("GO_ENV")
+var DB *gorm.DB
+
+func InitPostgres(cfg Config, env string) error {
+	// env := os.Getenv("GO_ENV")
 	if env == "" {
 		env = "local"
 	}
 
 	var pg PostgresConfig
-	cfg, err := LoadConfig()
-	if err != nil {
-		return err
-	}
+	// cfg, err := LoadConfig()
+	// if err != nil {
+	// 	return err
+	// }
 
 	switch env {
 	case "local":

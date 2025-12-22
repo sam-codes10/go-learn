@@ -21,6 +21,24 @@ definitions:
 info:
   contact: {}
 paths:
+  /v1/auth/send-email-otp:
+    get:
+      description: API for sending otp by email
+      parameters:
+      - default: satish.sund3r@gmail.com
+        description: email
+        in: query
+        name: email
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apihelpers.APIRes'
+      summary: send email otp
+      tags:
+      - Auth
   /v1/auth/signup:
     post:
       description: API for user signup
@@ -37,6 +55,29 @@ paths:
           schema:
             $ref: '#/definitions/apihelpers.APIRes'
       summary: User Signup
+      tags:
+      - Auth
+  /v1/auth/verify-email-otp:
+    get:
+      description: API for verifying otp by email
+      parameters:
+      - default: satish.sund3r@gmail.com
+        description: email
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: otp
+        in: query
+        name: otp
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apihelpers.APIRes'
+      summary: verify email otp
       tags:
       - Auth
 swagger: "2.0"
