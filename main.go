@@ -2,6 +2,7 @@ package main
 
 import (
 	"auth-service/dbops"
+	"auth-service/kafka"
 	"auth-service/loggerconfig"
 	"auth-service/router"
 	"fmt"
@@ -31,6 +32,8 @@ func main() {
 	if err != nil {
 		loggerconfig.Panic("Unable to connect db")
 	}
+
+	kafka.NewProducer(cfg, env, "otp")
 
 	err = dbops.InitRedis(cfg, env)
 	if err != nil {
