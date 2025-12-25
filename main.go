@@ -28,10 +28,10 @@ func main() {
 		loggerconfig.Panic("unable to load config")
 	}
 
-	// err = dbops.InitPostgres(cfg, env)
-	// if err != nil {
-	// 	loggerconfig.Panic("Unable to connect db")
-	// }
+	err = dbops.InitPostgres(cfg, env)
+	if err != nil {
+		loggerconfig.Panic("Unable to connect db")
+	}
 
 	writer := kafka.NewProducer(cfg, env)
 
@@ -40,7 +40,7 @@ func main() {
 		loggerconfig.Panic("Unable to connect redis")
 	}
 
-	// dbops.MigrateTables()
+	dbops.MigrateTables()
 
 	r := router.InitRouters(writer)
 	port := "8080"
