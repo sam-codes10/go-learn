@@ -41,7 +41,7 @@ func SignUp(c *gin.Context) {
 // @Param email query string true "email" default(satish.sund3r@gmail.com)
 // @Success 200 {object} apihelpers.APIRes
 // @Router /v1/auth/send-email-otp [get]
-func (p *OTPController) SendEmailOTP(c *gin.Context) {
+func SendEmailOTP(c *gin.Context) {
 	email := c.Query("email")
 	if email == "" {
 		apihelpers.SendBadRequest(c, "Email field is empty")

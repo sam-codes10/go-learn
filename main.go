@@ -33,7 +33,7 @@ func main() {
 		loggerconfig.Panic("Unable to connect db")
 	}
 
-	writer := kafka.NewProducer(cfg, env)
+	kafka.NewProducer(cfg, env, "otp")
 
 	err = dbops.InitRedis(cfg, env)
 	if err != nil {
@@ -42,7 +42,7 @@ func main() {
 
 	dbops.MigrateTables()
 
-	r := router.InitRouters(writer)
+	r := router.InitRouters()
 	port := "8080"
 	r.Run(":" + port)
 }

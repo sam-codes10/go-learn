@@ -2,14 +2,13 @@ package router
 
 import (
 	"auth-service/controller"
-	"auth-service/kafka"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func InitRouters(writer *kafka.Producer) *gin.Engine {
+func InitRouters() *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/swagger/auth-service/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -29,12 +28,10 @@ func InitRouters(writer *kafka.Producer) *gin.Engine {
 		}
 	})
 
-	otpController := controller.NewOTPController(writer)
-
 	v1Auth := r.Group("/v1/auth")
 	{
 		v1Auth.POST("/signup", controller.SignUp)
-		v1Auth.GET("/send-email-otp", otpController.SendEmailOTP)
+		v1Auth.GET("/send-email-otp", controller.SendEmailOTP)
 		v1Auth.GET("/verify-email-otp", controller.VerifyEmailOtp)
 	}
 	return r
