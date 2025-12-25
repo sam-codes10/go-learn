@@ -16,13 +16,18 @@ type RedisConfig struct {
 	DB       int    `mapstructure:"db"`
 }
 
+type KafkaConfig struct {
+	Brokers []string `mapstructure:"brokers"`
+}
+
 type LocalConfig struct {
 	Postgres PostgresConfig `mapstructure:"postgres"`
 	Redis    RedisConfig    `mapstructure:"redis"`
+	Kafka    KafkaConfig    `mapstructure:"kafka"`
 }
 
 type Config struct {
-    LocalConfig LocalConfig `mapstructure:"local"`
+	LocalConfig LocalConfig `mapstructure:"local"`
 }
 
 func LoadConfig() (Config, error) {

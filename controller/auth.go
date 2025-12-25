@@ -2,11 +2,20 @@ package controller
 
 import (
 	"auth-service/apihelpers"
+	"auth-service/kafka"
 	"auth-service/models"
 	"auth-service/service"
 
 	"github.com/gin-gonic/gin"
 )
+
+type OTPController struct {
+	producer *kafka.Producer
+}
+
+func NewOTPController(p *kafka.Producer) *OTPController {
+	return &OTPController{producer: p}
+}
 
 // @Tags Auth
 // @Summary User Signup
@@ -32,7 +41,7 @@ func SignUp(c *gin.Context) {
 // @Param email query string true "email" default(satish.sund3r@gmail.com)
 // @Success 200 {object} apihelpers.APIRes
 // @Router /v1/auth/send-email-otp [get]
-func SendEmailOTP(c *gin.Context) {
+func (p *OTPController) SendEmailOTP(c *gin.Context) {
 	email := c.Query("email")
 	if email == "" {
 		apihelpers.SendBadRequest(c, "Email field is empty")

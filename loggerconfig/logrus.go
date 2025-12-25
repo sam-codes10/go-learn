@@ -35,6 +35,16 @@ func PanicImpl(args ...interface{}) {
 	logger.Panic(message)
 }
 
+var Error = func(args ...interface{}) {
+	ErrorImpl(args...)
+}
+
+func ErrorImpl(args ...interface{}) {
+	message := buildMessage(args...)
+
+	logrus.Error(message)
+}
+
 func buildMessage(args ...interface{}) string {
 	var message string
 	for i, arg := range args {
@@ -47,7 +57,7 @@ func buildMessage(args ...interface{}) string {
 	return message
 }
 
-func InitLogrus () {
+func InitLogrus() {
 	logger = logrus.New()
 	logger.SetLevel(logrus.InfoLevel)
 }

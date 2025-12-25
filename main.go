@@ -2,6 +2,7 @@ package main
 
 import (
 	"auth-service/dbops"
+	"auth-service/kafka"
 	"auth-service/loggerconfig"
 	"auth-service/router"
 	"fmt"
@@ -27,19 +28,21 @@ func main() {
 		loggerconfig.Panic("unable to load config")
 	}
 
-	err = dbops.InitPostgres(cfg, env)
-	if err != nil {
-		loggerconfig.Panic("Unable to connect db")
-	}
+	// err = dbops.InitPostgres(cfg, env)
+	// if err != nil {
+	// 	loggerconfig.Panic("Unable to connect db")
+	// }
+
+	writer := kafka.NewProducer(cfg, env)
 
 	err = dbops.InitRedis(cfg, env)
 	if err != nil {
 		loggerconfig.Panic("Unable to connect redis")
 	}
 
-	dbops.MigrateTables()
+	// dbops.MigrateTables()
 
-	r := router.InitRouters()
+	r := router.InitRouters(writer)
 	port := "8080"
 	r.Run(":" + port)
 }
