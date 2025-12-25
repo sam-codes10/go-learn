@@ -2,20 +2,11 @@ package controller
 
 import (
 	"auth-service/apihelpers"
-	"auth-service/kafka"
 	"auth-service/models"
 	"auth-service/service"
 
 	"github.com/gin-gonic/gin"
 )
-
-type OTPController struct {
-	producer *kafka.Producer
-}
-
-func NewOTPController(p *kafka.Producer) *OTPController {
-	return &OTPController{producer: p}
-}
 
 // @Tags Auth
 // @Summary User Signup
