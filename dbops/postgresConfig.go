@@ -1,8 +1,10 @@
 package dbops
 
 import (
+	"auth-service/resourceConfig"
 	"fmt"
 	"log"
+
 	// "os"
 
 	"gorm.io/driver/postgres"
@@ -11,13 +13,13 @@ import (
 
 var DB *gorm.DB
 
-func InitPostgres(cfg Config, env string) error {
+func InitPostgres(cfg resourceConfig.Config, env string) error {
 	// env := os.Getenv("GO_ENV")
 	if env == "" {
 		env = "local"
 	}
 
-	var pg PostgresConfig
+	var pg resourceConfig.PostgresConfig
 	// cfg, err := LoadConfig()
 	// if err != nil {
 	// 	return err
