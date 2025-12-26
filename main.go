@@ -4,6 +4,7 @@ import (
 	"auth-service/dbops"
 	"auth-service/kafka"
 	"auth-service/loggerconfig"
+	"auth-service/resourceConfig"
 	"auth-service/router"
 	"fmt"
 	"os"
@@ -23,7 +24,7 @@ func main() {
 	loggerconfig.InitLogrus()
 	loggerconfig.Info("GIN auth-service started!")
 
-	cfg, err := dbops.LoadConfig()
+	cfg, err := resourceConfig.LoadConfig()
 	if err != nil {
 		loggerconfig.Panic("unable to load config")
 	}

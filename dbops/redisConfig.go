@@ -2,6 +2,7 @@ package dbops
 
 import (
 	"auth-service/loggerconfig"
+	"auth-service/resourceConfig"
 	"context"
 
 	"github.com/redis/go-redis/v9"
@@ -9,12 +10,12 @@ import (
 
 var RedisClient *redis.Client
 
-func InitRedis(cfg Config, env string) error {
+func InitRedis(cfg resourceConfig.Config, env string) error {
 	if env == "" {
 		env = "local"
 	}
 
-	var redisCfg RedisConfig
+	var redisCfg resourceConfig.RedisConfig
 
 	switch env {
 	case "local":

@@ -1,7 +1,8 @@
 package kafka
 
 import (
-	"auth-service/dbops"
+	"auth-service/resourceConfig"
+
 	"github.com/segmentio/kafka-go"
 )
 
@@ -11,12 +12,12 @@ type Producer struct {
 
 var kafkaProducer *Producer
 
-func NewProducer(cfg dbops.Config, env, topic string) {
+func NewProducer(cfg resourceConfig.Config, env, topic string) {
 	if env == "" {
 		env = "local"
 	}
 
-	var kafkaConfig dbops.KafkaConfig
+	var kafkaConfig resourceConfig.KafkaConfig
 
 	switch env {
 	case "local":
