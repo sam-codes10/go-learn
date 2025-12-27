@@ -7,12 +7,13 @@ import (
 )
 
 type Producer struct {
-	OTPWriter *kafka.Writer
+	EmailWriter        *kafka.Writer
+	NotificationWriter *kafka.Writer
 }
 
 var kafkaProducer *Producer
 
-func NewProducer(cfg resourceConfig.Config, env, topic string) {
+func NewProducer(cfg resourceConfig.Config, env string) {
 	if env == "" {
 		env = "local"
 	}
@@ -27,12 +28,18 @@ func NewProducer(cfg resourceConfig.Config, env, topic string) {
 	}
 
 	kafkaProducer = &Producer{
-		OTPWriter: &kafka.Writer{
-			Addr:     kafka.TCP(kafkaConfig.Brokers[0]),
-			Topic:    topic,
+		EmailWriter: kafka.NewWriter(kafka.WriterConfig{
+			Brokers:  kafkaConfig.Brokers,
+			Topic:    "otp",
 			Balancer: &kafka.Hash{},
-		},
+		}),
+		NotificationWriter: kafka.NewWriter(kafka.WriterConfig{
+			Brokers:  kafkaConfig.Brokers,
+			Topic:    "notification",
+			Balancer: &kafka.Hash{},
+		}),
 	}
+
 }
 
 func GetProducer() *Producer {

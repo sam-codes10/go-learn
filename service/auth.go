@@ -5,6 +5,7 @@ import (
 	"auth-service/constants"
 	"auth-service/db"
 	"auth-service/dbops"
+	"auth-service/kafka"
 	"auth-service/loggerconfig"
 	"auth-service/models"
 	"context"
@@ -86,6 +87,11 @@ func VerifyEmailOtp(email, otp string) (int, apihelpers.APIRes) {
 		return http.StatusBadRequest, apiRes
 	}
 
+	err = sendNotification("", email, "SUCCESS")
+	if err != nil {
+		loggerconfig.Error("Failed to send notification with error: " + err.Error())
+	}
+
 	apiRes.Status = true
 	apiRes.Message = constants.Success
 	return http.StatusOK, apiRes
@@ -106,6 +112,33 @@ func generateOTP(digitCount int) (string, error) {
 }
 
 func sendEmail(email, content string) error {
-	// to-be done later by samrat
+	producer := kafka.GetProducer()
+
+	msg := models.EmailMessage{
+		SenderEmail: email,
+		Content:     content,
+	}
+	err := producer.SendEmail(context.Background(), msg)
+	if err != nil {
+		loggerconfig.Error("Failed to send email to kafka with error: ", err)
+		return err
+	}
+	return nil
+}
+
+func sendNotification(userId, email, content string) error {
+	producer := kafka.GetProducer()
+	msg := models.NotificationMessage{
+		UserId:  userId,
+		Email:   email,
+		Content: content,
+	}
+
+	err := producer.SendNotification(context.Background(), msg)
+	if err != nil {
+		loggerconfig.Error("Failed to send notification to kafka with error: ", err)
+		return err
+	}
+
 	return nil
 }

@@ -34,7 +34,7 @@ func main() {
 		loggerconfig.Panic("Unable to connect db")
 	}
 
-	kafka.NewProducer(cfg, env, "otp")
+	kafka.NewProducer(cfg, env)
 
 	err = dbops.InitRedis(cfg, env)
 	if err != nil {
