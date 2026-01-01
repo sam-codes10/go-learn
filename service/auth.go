@@ -5,12 +5,12 @@ import (
 	"auth-service/constants"
 	"auth-service/db"
 	"auth-service/dbops"
-	"auth-service/kafka"
+	"auth-service/helpers"
+	
 	"auth-service/loggerconfig"
 	"auth-service/models"
 	"context"
-	"crypto/rand"
-	"math/big"
+	
 	"net/http"
 	"time"
 
@@ -42,7 +42,7 @@ func SendEmailOTP(email string) (int, apihelpers.APIRes) {
 	var apiRes apihelpers.APIRes
 	ctx := context.Background()
 
-	otp, err := generateOTP(constants.OtpLengthForVerifyEmail)
+	otp, err := helpers.GenerateOTP(constants.OtpLengthForVerifyEmail)
 	if err != nil {
 		otp = "789451"
 	}
@@ -55,7 +55,7 @@ func SendEmailOTP(email string) (int, apihelpers.APIRes) {
 	content := "Your otp is : " + otp
 	loggerconfig.Info("OTP for email: ", email, " is ", otp)
 
-	err = sendEmail(email, content)
+	err = helpers.SendEmail(email, content)
 	if err != nil {
 		return apihelpers.SendInternalServerError("")
 	}
@@ -87,7 +87,13 @@ func VerifyEmailOtp(email, otp string) (int, apihelpers.APIRes) {
 		return http.StatusBadRequest, apiRes
 	}
 
-	err = sendNotification("", email, "SUCCESS")
+	err = db.MarkUserEmailAsVerified(email)
+	if err != nil {
+		loggerconfig.Error("Failed to mark email as verified in db with error: " + err.Error())
+		return apihelpers.SendInternalServerError("Failed to mark email as verified in db with error: " + err.Error())
+	}
+
+	err = helpers.SendNotification("", email, "SUCCESS")
 	if err != nil {
 		loggerconfig.Error("Failed to send notification with error: " + err.Error())
 	}
@@ -97,48 +103,20 @@ func VerifyEmailOtp(email, otp string) (int, apihelpers.APIRes) {
 	return http.StatusOK, apiRes
 }
 
-func generateOTP(digitCount int) (string, error) {
-	const digits = "0123456789"
-	length := digitCount
-	b := make([]byte, length)
-	for i := 0; i < length; i++ {
-		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(digits))))
-		if err != nil {
-			return "", err
-		}
-		b[i] = digits[randomIndex.Int64()]
-	}
-	return string(b), nil
-}
+func Login(payload models.Login) (int, apihelpers.APIRes) {
+	var apiRes apihelpers.APIRes
 
-func sendEmail(email, content string) error {
-	producer := kafka.GetProducer()
-
-	msg := models.EmailMessage{
-		SenderEmail: email,
-		Content:     content,
-	}
-	err := producer.SendEmail(context.Background(), msg)
+	userProfile, err := db.GetUserProfileByEmail(payload.EmailId)
 	if err != nil {
-		loggerconfig.Error("Failed to send email to kafka with error: ", err)
-		return err
+		loggerconfig.Error("Login failed to fetch user profile from db with error: ", err)
+		return apihelpers.SendInternalServerError("Failed to fetch user profile from db with error: " + err.Error())
 	}
-	return nil
-}
-
-func sendNotification(userId, email, content string) error {
-	producer := kafka.GetProducer()
-	msg := models.NotificationMessage{
-		UserId:  userId,
-		Email:   email,
-		Content: content,
+	if userProfile.Password != payload.Password {
+		apiRes.Status = false
+		apiRes.Message = "Invalid credentials"
+		return http.StatusUnauthorized, apiRes
 	}
-
-	err := producer.SendNotification(context.Background(), msg)
-	if err != nil {
-		loggerconfig.Error("Failed to send notification to kafka with error: ", err)
-		return err
-	}
-
-	return nil
+	apiRes.Status = true
+	apiRes.Message = constants.Success
+	return http.StatusOK, apiRes
 }

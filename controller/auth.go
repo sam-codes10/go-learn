@@ -59,3 +59,19 @@ func VerifyEmailOtp(c *gin.Context) {
 	code, resp := service.VerifyEmailOtp(email, otp)
 	apihelpers.CustomResponse(c, code, resp)
 }
+
+// @Tags Auth
+// @Summary User Login
+// @Description API for user login
+// @Param body body models.Login true "Login Payload"
+// @Success 200 {object} apihelpers.APIRes
+// @Router /v1/auth/login [post]
+func Login(c *gin.Context) {
+	var payload models.Login
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		apihelpers.SendBadRequest(c, "invalid payload")
+		return
+	}
+	code, resp := service.Login(payload)
+	apihelpers.CustomResponse(c, code, resp)
+}

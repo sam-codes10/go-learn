@@ -8,6 +8,6 @@ type Claims struct {
 }
 
 const (
-	UserRole  = "user"
-	AdminRole = "admin"
+	RoleUser  = "user"
+	RoleAdmin = "admin"
 )
