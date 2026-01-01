@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"auth-service/constants"
 	"auth-service/resourceConfig"
 
 	"github.com/segmentio/kafka-go"
@@ -30,12 +31,12 @@ func NewProducer(cfg resourceConfig.Config, env string) {
 	kafkaProducer = &Producer{
 		EmailWriter: kafka.NewWriter(kafka.WriterConfig{
 			Brokers:  kafkaConfig.Brokers,
-			Topic:    "otp",
+			Topic:    constants.EmailTopic,
 			Balancer: &kafka.Hash{},
 		}),
 		NotificationWriter: kafka.NewWriter(kafka.WriterConfig{
 			Brokers:  kafkaConfig.Brokers,
-			Topic:    "notification",
+			Topic:    constants.NotificationTopic,
 			Balancer: &kafka.Hash{},
 		}),
 	}

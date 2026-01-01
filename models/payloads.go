@@ -6,3 +6,8 @@ type SignUp struct {
 	PhoneNumber string `json:"phoneNumber"`
 	Password    string `json:"password"`
 }
+
+type Login struct {
+	EmailId  string `json:"emailId"`
+	Password string `json:"password"`
+}

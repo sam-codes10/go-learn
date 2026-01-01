@@ -10,3 +10,9 @@ const (
 	Success = "SUCCESS"
 	Fail    = "FAIL"
 )
+
+// kafka-topic names
+const (
+	EmailTopic          = "email"
+	NotificationTopic = "notification"
+)
