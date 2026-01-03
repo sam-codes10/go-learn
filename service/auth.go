@@ -6,14 +6,16 @@ import (
 	"auth-service/db"
 	"auth-service/dbops"
 	"auth-service/helpers"
-	
+	"auth-service/middleware"
+
 	"auth-service/loggerconfig"
 	"auth-service/models"
 	"context"
-	
+
 	"net/http"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
@@ -23,18 +25,41 @@ func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 
 	userProfile := models.UserProfile{
 		UserId:      uuid.New().String(),
-		UserName:    payload.EmailId,
+		UserName:    helpers.ExtractUserNameFromEmail(payload.EmailId),
 		Name:        payload.Name,
 		Email:       payload.EmailId,
 		PhoneNumber: payload.PhoneNumber,
 		Password:    payload.Password,
-		Verified:    false,
+		// Verified:    false,
+		Role: constants.RoleGuest,
 	}
 
 	err := db.CreateUserProfile(userProfile)
 	if err != nil {
-		return apihelpers.SendInternalServerError("Some internal server occurred!")
+		loggerconfig.Error("Signup failed to create user profile in db with error: ", err)
+		return apihelpers.SendInternalServerError("Some internal server occurred! error: " + err.Error())
 	}
+
+	jwtClaims := models.Claims{
+		Uuid:  userProfile.UserId,
+		Email: userProfile.UserName,
+		Role:  constants.RoleGuest,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(1)).Unix(),
+		},
+	}
+	token, err := middleware.GenerateToken(jwtClaims)
+	if err != nil {
+		loggerconfig.Error("Signup failed to generate jwt token with error: ", err)
+		return apihelpers.SendInternalServerError("Unable to sign-up due to error : " + err.Error())
+	}
+
+	apiRes.Status = true
+	apiRes.Data = models.SignUpRes{
+		AuthToken: token,
+		Email:     userProfile.Email,
+	}
+	apiRes.Message = "auth-successful"
 	return http.StatusOK, apiRes
 }
 

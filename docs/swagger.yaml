@@ -19,10 +19,24 @@ definitions:
       emailId:
         type: string
       name:
+        minLength: 2
         type: string
       password:
+        minLength: 8
         type: string
       phoneNumber:
+        type: string
+    required:
+    - emailId
+    - name
+    - password
+    - phoneNumber
+    type: object
+  models.SignUpRes:
+    properties:
+      authToken:
+        type: string
+      email:
         type: string
     type: object
 info:
@@ -78,7 +92,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/apihelpers.APIRes'
+            allOf:
+            - $ref: '#/definitions/apihelpers.APIRes'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.SignUpRes'
+              type: object
       summary: User Signup
       tags:
       - Auth

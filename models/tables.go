@@ -7,7 +7,8 @@ type UserProfile struct {
 	Email       string `gorm:"column:email"`
 	PhoneNumber string `gorm:"column:phone_number"`
 	Password    string `gorm:"column:password"`
-	Verified    bool   `gorm:"column:verified"`
+	// Verified    bool   `gorm:"column:verified"`
+	Role string `gorm:"column:role"`
 }
 
 func (UserProfile) TableName() string {

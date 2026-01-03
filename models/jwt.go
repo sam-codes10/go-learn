@@ -1,13 +1,10 @@
 package models
 
-type Claims struct {
-	Uuid       string
-	Email      string
-	Role       string
-	IsVerified bool
-}
+import "github.com/golang-jwt/jwt"
 
-const (
-	RoleUser  = "user"
-	RoleAdmin = "admin"
-)
+type Claims struct {
+	Uuid  string
+	Email string
+	Role  string
+	jwt.StandardClaims
+}

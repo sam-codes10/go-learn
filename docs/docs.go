@@ -92,7 +92,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/apihelpers.APIRes"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apihelpers.APIRes"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.SignUpRes"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -159,17 +171,36 @@ const docTemplate = `{
         },
         "models.SignUp": {
             "type": "object",
+            "required": [
+                "emailId",
+                "name",
+                "password",
+                "phoneNumber"
+            ],
             "properties": {
                 "emailId": {
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 2
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 8
                 },
                 "phoneNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SignUpRes": {
+            "type": "object",
+            "properties": {
+                "authToken": {
+                    "type": "string"
+                },
+                "email": {
                     "type": "string"
                 }
             }

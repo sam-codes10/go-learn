@@ -13,6 +13,18 @@ const (
 
 // kafka-topic names
 const (
-	EmailTopic          = "email"
+	EmailTopic        = "email"
 	NotificationTopic = "notification"
+)
+
+var DomainEmailMapping = map[string]string{
+	"gmail.com":   "g",
+	"yahoo.com":   "y",
+	"hotmail.com": "h",
+}
+
+const (
+	RoleGuest = "guest"
+	RoleUser  = "user"
+	RoleAdmin = "admin"
 )
