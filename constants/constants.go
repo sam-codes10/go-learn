@@ -1,5 +1,5 @@
 package constants
 
 const (
-	SenderMail = "hello@demomailtrap.co"
+	SenderMail = "mauryavikashhere@gmail.com"
 )

@@ -1,4 +1,4 @@
-module notifier-service
+module emailer-service
 
 go 1.24.6
 

@@ -4,11 +4,10 @@ package kafka
 import (
 	"context"
 	"encoding/json"
-	"notifier-service/config"
-	"notifier-service/loggerconfig"
-	"notifier-service/models"
-	"notifier-service/notifier"
-	"sync"
+	"emailer-service/config"
+	"emailer-service/loggerconfig"
+	"emailer-service/models"
+	"emailer-service/emailer"
 
 	// "time"
 
@@ -45,29 +44,17 @@ func (c *Consumer) Start(ctx context.Context, cfg config.Config) error {
 			continue
 		}
 
-		loggerconfig.Info("Kafka message: topic=%s partition=%d offset=%d key=%s\n", msg.Topic, msg.Partition, msg.Offset, string(msg.Key))
+	loggerconfig.Info("Kafka message: topic=", msg.Topic, " partition=", msg.Partition, " offset=", msg.Offset, " key=msg.Key")
 
-		switch msg.Topic {
-		case "otp":
-			loggerconfig.Info("Processed OTP message: %s", string(msg.Value))
-			var consumerMessageOTP models.ConsumerMessageOTP
-			err := json.Unmarshal(msg.Value, &consumerMessageOTP)
+			var consumerMessage models.ConsumerMessage
+			err = json.Unmarshal(msg.Value, &consumerMessage)
 			if err != nil {
-				loggerconfig.Error("kafka-consumer: failed to unmarshal OTP message:", err)
+				loggerconfig.Error("kafka-consumer: failed to unmarshal email:", err)
 				continue
 			}
-			var wg *sync.WaitGroup
-			if consumerMessageOTP.SMS {
-				wg.Add(1)
-				go notifier.SendSMS(json.RawMessage(consumerMessageOTP.Content))
-			}
-			if consumerMessageOTP.Email {
-				wg.Add(1)
-				go notifier.SendEmail(json.RawMessage(consumerMessageOTP.Content), cfg)
-			}
-			wg.Wait()
-		default:
-			loggerconfig.Info("No specific processing for topic: %s", msg.Topic)
-		}
+			err = notifier.SendEmail(consumerMessage, cfg)
+			if err!=nil{
+				loggerconfig.Error("kafka-consumer: failed to send email : ", err)
+		}	
 	}
 }

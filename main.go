@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"notifier-service/config"
-	"notifier-service/kafka"
+	"emailer-service/config"
+	"emailer-service/kafka"
+	"emailer-service/loggerconfig"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -17,11 +17,12 @@ func main() {
 	if env == "" {
 		env = "local"
 	}
+	
+	loggerconfig.InitLogrus()
 
 	cfg := config.Start(env)
 
-	otpConsumer := kafka.NewConsumer("otp", "otp-notifier-group", cfg)
-	go otpConsumer.Start(context.Background(), cfg)
-	fmt.Println("eof")
-	select {}
+	emailConsumer := kafka.NewConsumer("emailer", "emailer-service", cfg)
+	go emailConsumer.Start(context.Background(), cfg)
+	select{}
 }

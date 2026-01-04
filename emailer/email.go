@@ -1,28 +1,20 @@
 package notifier
 
 import (
-	"encoding/json"
-	"log"
-	"notifier-service/config"
-	"notifier-service/constants"
-	"notifier-service/models"
+	"emailer-service/config"
+	"emailer-service/constants"
+	"emailer-service/models"
+	"time"
 
 	"github.com/go-mail/mail/v2"
 )
 
-func SendEmail(value []byte, config config.Config) error {
-	var msg models.EmailMessage
-
-	err := json.Unmarshal(value, &msg)
-	if err != nil {
-		log.Fatal("SendEmail (notifier) - Wrong email format, failed to unmarshal")
-		return err
-	}
+func SendEmail(consumerMessage models.ConsumerMessage, config config.Config) error {
 
 	emailMsg := models.EmailMessage{
-		To:      msg.To,
-		Subject: msg.Subject,
-		Body:    msg.Body,
+		To:      consumerMessage.RecieverMail,
+		Subject: consumerMessage.Subject,
+		Body:    consumerMessage.Content,
 	}
 
 	email := mail.NewMessage()
@@ -38,6 +30,8 @@ func SendEmail(value []byte, config config.Config) error {
 		config.SMTP.SMTPUser,
 		config.SMTP.SMTPPass,
 	)
+
+	dialer.Timeout = 20*time.Second
 
 	return dialer.DialAndSend(email)
 }
