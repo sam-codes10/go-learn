@@ -37,3 +37,10 @@ func CustomResponse(c *gin.Context, code int, data interface{}, optionalParams .
 	// Send the JSON response
 	c.JSON(code, data)
 }
+
+func SendErrorResponse(message string, code int) (int, APIRes) {
+	var apiRes APIRes
+	apiRes.Status = false
+	apiRes.Message = message
+	return code, apiRes
+}

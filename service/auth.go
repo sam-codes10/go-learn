@@ -21,6 +21,7 @@ import (
 )
 
 func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
+	ctx := context.Background()
 	var apiRes apihelpers.APIRes
 
 	userProfile := models.UserProfile{
@@ -34,7 +35,19 @@ func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 		Role: constants.RoleGuest,
 	}
 
-	err := db.CreateUserProfile(userProfile)
+	// check if the email provided by 'guest' is already in use by 'user' or not
+	exists, err := db.CheckEmailIsAlreadyInUseByUser(userProfile.Email, ctx)
+	if err != nil {
+		loggerconfig.Error("Signup (service) failed to check email in use by user with error: ", err)
+		return apihelpers.SendInternalServerError("Failed to check email in use by user with error: " + err.Error())
+	}
+
+	if exists {
+		loggerconfig.Error("Signup (service) Email provided by guest is already in use by user")
+		return apihelpers.SendErrorResponse(" Email provided by guest is already in use by user", http.StatusForbidden)
+	}
+
+	err = db.CreateUserProfile(userProfile)
 	if err != nil {
 		loggerconfig.Error("Signup failed to create user profile in db with error: ", err)
 		return apihelpers.SendInternalServerError("Some internal server occurred! error: " + err.Error())
