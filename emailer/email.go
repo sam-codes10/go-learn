@@ -31,7 +31,7 @@ func SendEmail(consumerMessage models.ConsumerMessage, config config.Config) err
 		config.SMTP.SMTPPass,
 	)
 
-	dialer.Timeout = 20*time.Second
+	dialer.Timeout = 20 * time.Second
 
 	return dialer.DialAndSend(email)
 }

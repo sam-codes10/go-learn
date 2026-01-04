@@ -7,7 +7,7 @@ type EmailMessage struct {
 }
 
 type ConsumerMessage struct {
-	Content         string `json:"content"`
-	Subject         string `json:"subject"`
-	RecieverMail    string `json:"recieverMail"`
+	Content      string `json:"content"`
+	Subject      string `json:"subject"`
+	RecieverMail string `json:"recieverMail"`
 }

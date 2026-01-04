@@ -17,12 +17,12 @@ func main() {
 	if env == "" {
 		env = "local"
 	}
-	
+
 	loggerconfig.InitLogrus()
 
 	cfg := config.Start(env)
 
 	emailConsumer := kafka.NewConsumer("emailer", "emailer-service", cfg)
 	go emailConsumer.Start(context.Background(), cfg)
-	select{}
+	select {}
 }

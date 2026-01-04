@@ -3,11 +3,11 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
 	"emailer-service/config"
+	"emailer-service/emailer"
 	"emailer-service/loggerconfig"
 	"emailer-service/models"
-	"emailer-service/emailer"
+	"encoding/json"
 
 	// "time"
 
@@ -44,17 +44,17 @@ func (c *Consumer) Start(ctx context.Context, cfg config.Config) error {
 			continue
 		}
 
-	loggerconfig.Info("Kafka message: topic=", msg.Topic, " partition=", msg.Partition, " offset=", msg.Offset, " key=msg.Key")
+		loggerconfig.Info("Kafka message: topic=", msg.Topic, " partition=", msg.Partition, " offset=", msg.Offset, " key=msg.Key")
 
-			var consumerMessage models.ConsumerMessage
-			err = json.Unmarshal(msg.Value, &consumerMessage)
-			if err != nil {
-				loggerconfig.Error("kafka-consumer: failed to unmarshal email:", err)
-				continue
-			}
-			err = notifier.SendEmail(consumerMessage, cfg)
-			if err!=nil{
-				loggerconfig.Error("kafka-consumer: failed to send email : ", err)
-		}	
+		var consumerMessage models.ConsumerMessage
+		err = json.Unmarshal(msg.Value, &consumerMessage)
+		if err != nil {
+			loggerconfig.Error("kafka-consumer: failed to unmarshal email:", err)
+			continue
+		}
+		err = notifier.SendEmail(consumerMessage, cfg)
+		if err != nil {
+			loggerconfig.Error("kafka-consumer: failed to send email : ", err)
+		}
 	}
 }
