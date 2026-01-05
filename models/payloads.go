@@ -1,10 +1,10 @@
 package models
 
 type SignUp struct {
-	Name        string `json:"name"`
-	EmailId     string `json:"emailId"`
-	PhoneNumber string `json:"phoneNumber"`
-	Password    string `json:"password"`
+	Name        string `json:"name" validate:"required,min=2"`
+	EmailId     string `json:"emailId" validate:"required,email"`
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+	Password    string `json:"password" validate:"required,min=8"`
 }
 
 type Login struct {

@@ -1,8 +1,10 @@
 package db
 
 import (
+	"auth-service/constants"
 	"auth-service/dbops"
 	"auth-service/models"
+	"context"
 )
 
 func CreateUserProfile(userProfile models.UserProfile) error {
@@ -17,4 +19,20 @@ func GetUserProfileByEmail(email string) (models.UserProfile, error) {
 	var userProfile models.UserProfile
 	err := dbops.DB.Where("email_id = ?", email).First(&userProfile).Error
 	return userProfile, err
+}
+
+func CheckEmailIsAlreadyInUseByUser(email string, ctx context.Context) (bool, error) {
+	count := 0
+
+	query := `SELECT COUNT(*) FROM user_profile WHERE email = ? AND role = ?`
+
+	err := dbops.DB.WithContext(ctx).Raw(query, email, constants.RoleUser).Scan(&count).Error
+	if err != nil {
+		return false, nil
+	}
+
+	if count == 0 {
+		return false, nil
+	}
+	return true, nil
 }

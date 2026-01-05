@@ -6,19 +6,26 @@ import (
 	"auth-service/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 // @Tags Auth
 // @Summary User Signup
 // @Description API for user signup
 // @Param body body models.SignUp true "Signup Payload"
-// @Success 200 {object} apihelpers.APIRes
+// @Success 200 {object} apihelpers.APIRes{data=models.SignUpRes}
 // @Router /v1/auth/signup [post]
 func SignUp(c *gin.Context) {
 	var payload models.SignUp
 
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		apihelpers.SendBadRequest(c, "invalid payload")
+		return
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(payload); err != nil {
+		apihelpers.SendBadRequest(c, "validation error: "+err.Error())
 		return
 	}
 

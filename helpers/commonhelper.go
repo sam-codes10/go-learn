@@ -1,12 +1,14 @@
 package helpers
 
 import (
+	"auth-service/constants"
 	"auth-service/kafka"
 	"auth-service/loggerconfig"
 	"auth-service/models"
 	"context"
 	"crypto/rand"
 	"math/big"
+	"strings"
 )
 
 func GenerateOTP(digitCount int) (string, error) {
@@ -53,4 +55,14 @@ func SendNotification(userId, email, content string) error {
 	}
 
 	return nil
+}
+
+func ExtractUserNameFromEmail(email string) string {
+	at := strings.Index(email, "@")
+	if at == -1 {
+		return ""
+	}
+
+	userName := email[:at] + "-" + constants.DomainEmailMapping[email[at+1:]]
+	return userName
 }
