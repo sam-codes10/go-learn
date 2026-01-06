@@ -47,9 +47,5 @@ func GetGuestUsernameCount(email string, ctx context.Context) (int, error) {
 		return count, err
 	}
 
-	if count == 0 {
-		return count, err
-	}
-
 	return count, nil
 }
