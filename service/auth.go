@@ -57,11 +57,9 @@ func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 		return apihelpers.SendErrorResponse(" Email provided by guest is already in use by user", http.StatusForbidden)
 	}
 
-	// check the count of the username so that no two users exist with same username
-	count, err := db.GetUsernameCount(userProfile.UserName, ctx)
-	if count > 0 {
-		userProfile.UserName = userProfile.UserName + "-" + strconv.Itoa(count)
-	}
+	// check the count of the email so that no two users exist with same username
+	count, err := db.GetGuestUsernameCount(userProfile.Email, ctx)
+	userProfile.UserName = userProfile.UserName + "-" + strconv.Itoa(count+1)
 
 	err = db.CreateUserProfile(userProfile)
 	if err != nil {
