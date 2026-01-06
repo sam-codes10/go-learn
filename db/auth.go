@@ -36,3 +36,16 @@ func CheckEmailIsAlreadyInUseByUser(email string, ctx context.Context) (bool, er
 	}
 	return true, nil
 }
+
+func GetGuestUsernameCount(email string, ctx context.Context) (int, error) {
+	count := 0
+
+	query := `SELECT COUNT(*) FROM user_profile WHERE email = ? AND role = ?`
+
+	err := dbops.DB.WithContext(ctx).Raw(query, email, constants.RoleGuest).Scan(&count).Error
+	if err != nil {
+		return count, err
+	}
+
+	return count, nil
+}

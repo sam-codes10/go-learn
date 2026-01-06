@@ -7,6 +7,7 @@ import (
 	"auth-service/dbops"
 	"auth-service/helpers"
 	"auth-service/middleware"
+	"strconv"
 
 	"auth-service/loggerconfig"
 	"auth-service/models"
@@ -18,11 +19,18 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 	ctx := context.Background()
 	var apiRes apihelpers.APIRes
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
+	if err != nil {
+		loggerconfig.Error("Signup (service) failed to hash password: ", err)
+		return apihelpers.SendInternalServerError("Failed to hash password: " + err.Error())
+	}
 
 	userProfile := models.UserProfile{
 		UserId:      uuid.New().String(),
@@ -30,9 +38,11 @@ func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 		Name:        payload.Name,
 		Email:       payload.EmailId,
 		PhoneNumber: payload.PhoneNumber,
-		Password:    payload.Password,
+		Password:    string(hashedPassword),
 		// Verified:    false,
-		Role: constants.RoleGuest,
+		Role:      constants.RoleGuest,
+		Lock:      false,
+		CreatedAt: time.Now().Unix(),
 	}
 
 	// check if the email provided by 'guest' is already in use by 'user' or not
@@ -47,6 +57,10 @@ func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 		return apihelpers.SendErrorResponse(" Email provided by guest is already in use by user", http.StatusForbidden)
 	}
 
+	// check the count of the email so that no two users exist with same username
+	count, err := db.GetGuestUsernameCount(userProfile.Email, ctx)
+	userProfile.UserName = userProfile.UserName + "-" + strconv.Itoa(count+1)
+
 	err = db.CreateUserProfile(userProfile)
 	if err != nil {
 		loggerconfig.Error("Signup failed to create user profile in db with error: ", err)
@@ -57,6 +71,7 @@ func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 		Uuid:  userProfile.UserId,
 		Email: userProfile.UserName,
 		Role:  constants.RoleGuest,
+		Lock:  false,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(1)).Unix(),
 		},

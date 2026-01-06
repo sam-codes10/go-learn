@@ -6,5 +6,6 @@ type Claims struct {
 	Uuid  string
 	Email string
 	Role  string
+	Lock  bool
 	jwt.StandardClaims
 }
