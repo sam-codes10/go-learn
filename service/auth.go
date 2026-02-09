@@ -6,10 +6,10 @@ import (
 	"auth-service/db"
 	"auth-service/dbops"
 	"auth-service/helpers"
-	"auth-service/middleware"
 	"strconv"
 
 	"auth-service/loggerconfig"
+	"auth-service/middleware"
 	"auth-service/models"
 	"context"
 
@@ -83,7 +83,7 @@ func Signup(payload models.SignUp) (int, apihelpers.APIRes) {
 	}
 
 	apiRes.Status = true
-	apiRes.Data = models.SignUpRes{
+	apiRes.Data = models.AuthRes{
 		AuthToken: token,
 		Email:     userProfile.Email,
 	}
@@ -159,17 +159,59 @@ func VerifyEmailOtp(email, otp string) (int, apihelpers.APIRes) {
 func Login(payload models.Login) (int, apihelpers.APIRes) {
 	var apiRes apihelpers.APIRes
 
-	userProfile, err := db.GetUserProfileByEmail(payload.EmailId)
+	var jwtClaims models.Claims
+	switch payload.Role {
+	case constants.RoleUser:
+		userProfile, err := db.GetUserProfileByEmail(payload.EmailId)
+		if err != nil {
+			loggerconfig.Error("Login failed to fetch user profile from db with error: ", err)
+			return apihelpers.SendInternalServerError("Failed to fetch user profile from db with error: " + err.Error())
+		}
+		if userProfile.Password != payload.Password {
+			apiRes.Status = false
+			apiRes.Message = "Invalid credentials"
+			return http.StatusUnauthorized, apiRes
+		}
+		jwtClaims = models.Claims{
+			Uuid:  userProfile.UserId,
+			Email: userProfile.UserName,
+			Role:  constants.RoleGuest,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
+			},
+		}
+	case constants.RoleGuest:
+		userProfile, err := db.GetUserProfileByUsername(payload.Username)
+		if err != nil {
+			loggerconfig.Error("Login failed to fetch guest profile from db with error: ", err)
+			return apihelpers.SendInternalServerError("Failed to fetch guest profile from db with error: " + err.Error())
+		}
+		if userProfile.Password != payload.Password {
+			apiRes.Status = false
+			apiRes.Message = "Invalid credentials"
+			return http.StatusUnauthorized, apiRes
+		}
+		jwtClaims = models.Claims{
+			Uuid:  userProfile.UserId,
+			Email: userProfile.UserName,
+			Role:  constants.RoleGuest,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(1)).Unix(),
+			},
+		}
+	}
+
+	token, err := middleware.GenerateToken(jwtClaims)
 	if err != nil {
-		loggerconfig.Error("Login failed to fetch user profile from db with error: ", err)
-		return apihelpers.SendInternalServerError("Failed to fetch user profile from db with error: " + err.Error())
+		loggerconfig.Error("Signup failed to generate jwt token with error: ", err)
+		return apihelpers.SendInternalServerError("Unable to sign-up due to error : " + err.Error())
 	}
-	if userProfile.Password != payload.Password {
-		apiRes.Status = false
-		apiRes.Message = "Invalid credentials"
-		return http.StatusUnauthorized, apiRes
-	}
+
 	apiRes.Status = true
 	apiRes.Message = constants.Success
+	apiRes.Data = models.AuthRes{
+		AuthToken: token,
+		Email:     jwtClaims.Email,
+	}
 	return http.StatusOK, apiRes
 }

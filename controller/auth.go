@@ -2,6 +2,7 @@ package controller
 
 import (
 	"auth-service/apihelpers"
+	"auth-service/constants"
 	"auth-service/models"
 	"auth-service/service"
 
@@ -69,7 +70,7 @@ func VerifyEmailOtp(c *gin.Context) {
 
 // @Tags Auth
 // @Summary User Login
-// @Description API for user login
+// @Description API for user login. For guest user, username is also required. For user, email/username either works
 // @Param body body models.Login true "Login Payload"
 // @Success 200 {object} apihelpers.APIRes
 // @Router /v1/auth/login [post]
@@ -79,6 +80,17 @@ func Login(c *gin.Context) {
 		apihelpers.SendBadRequest(c, "invalid payload")
 		return
 	}
+
+	validate := validator.New()
+	if err := validate.Struct(payload); err != nil {
+		apihelpers.SendBadRequest(c, "validation error: "+err.Error())
+		return
+	}
+
+	if payload.Role == constants.RoleGuest && payload.Username == "" {
+		apihelpers.SendBadRequest(c, "For guest user, username is required")
+	}
+
 	code, resp := service.Login(payload)
 	apihelpers.CustomResponse(c, code, resp)
 }
