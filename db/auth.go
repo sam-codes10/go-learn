@@ -49,3 +49,9 @@ func GetGuestUsernameCount(email string, ctx context.Context) (int, error) {
 
 	return count, nil
 }
+
+func GetUserProfileByUsername(username string) (models.UserProfile, error) {
+	var userProfile models.UserProfile
+	err := dbops.DB.Where("username = ?", username).First(&userProfile).Error
+	return userProfile, err
+}

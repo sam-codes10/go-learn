@@ -9,5 +9,7 @@ type SignUp struct {
 
 type Login struct {
 	EmailId  string `json:"emailId"`
+	Username string `json:"username"`
 	Password string `json:"password"`
+	Role     string `json:"role validate:"required,oneof=admin user guest"`
 }

@@ -1,6 +1,6 @@
 package models
 
-type SignUpRes struct {
+type AuthRes struct {
 	AuthToken string `json:"authToken"`
 	Email     string `json:"email"`
 }

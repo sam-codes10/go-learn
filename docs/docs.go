@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/v1/auth/login": {
             "post": {
-                "description": "API for user login",
+                "description": "API for user login. For guest user, username is also required. For user, email/username either works",
                 "tags": [
                     "Auth"
                 ],
@@ -165,6 +165,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "role validate:": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
